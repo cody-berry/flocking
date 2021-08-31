@@ -8,7 +8,7 @@
 #     Cohesion: Steer towards nearby boids
 #     Obsticle Avoidance: Get away from obsticles
 #
-# v0.0  - Create the Boid class
+# v0.01 - Create the Boid class
 # v0.0  - Alignment
 # v0.0  - Cohesion
 # v0.0  - Separation
@@ -41,7 +41,9 @@ def draw():
     # others not updated, resulting in the boids just going in circles.
     for boid in boids:
         boid.update()
+        boid.edges()
         # boid.acc.add(PVector.random2D().mult(random(0.1, 0.3)))
         
     for boid in boids:
         boid.show()
+        boid.flock(boids)
