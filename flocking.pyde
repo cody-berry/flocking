@@ -36,6 +36,7 @@ def setup():
 def draw():
     global boids
     background(210, 80, 32)
+    fill(0, 0, 100)
     # If we do just alignment, if the force is too strong, since the boids
     # depend on all of the other boids, some of the depended ones updated and 
     # others not updated, resulting in the boids just going in circles.
@@ -45,5 +46,6 @@ def draw():
         # boid.acc.add(PVector.random2D().mult(random(0.1, 0.3)))
         
     for boid in boids:
+        fill(0, 0, 100)
         boid.show()
         boid.flock(boids)
