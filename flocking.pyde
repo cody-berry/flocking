@@ -9,11 +9,10 @@
 #     Obsticle Avoidance: Get away from obsticles
 #
 # v0.01 - Create the Boid class
-# v0.0  - Alignment
-# v0.0  - Cohesion
+# v0.02 - Alignment
+# v0.03 - Cohesion
 # v0.0  - Separation
 # v0.0  - Obstacle Avoidance
-# v0.0  - Quadtree
 # v0.0  - Hack bot
 # v0.1  - 3D
 # v0.1  - Adjustible obstacles
@@ -41,6 +40,7 @@ def draw():
     # depend on all of the other boids, some of the depended ones updated and 
     # others not updated, resulting in the boids just going in circles.
     for boid in boids:
+        boid.flock(boids)
         boid.update()
         boid.edges()
         # boid.acc.add(PVector.random2D().mult(random(0.1, 0.3)))
@@ -48,4 +48,13 @@ def draw():
     for boid in boids:
         fill(0, 0, 100)
         boid.show()
-        boid.flock(boids)
+    
+    s = "FPS: {:.0f}".format(frameRate)
+    fill(0, 0, 100, 30)
+    stroke(0, 0, 100)
+    rect(40, 55, textWidth(s)+20, -32, 5)
+    textSize(24)
+    fill(0, 0, 100)
+    text(s, 50, 50)
+        
+    
