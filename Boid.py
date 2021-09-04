@@ -27,6 +27,23 @@ class Boid:
         self.acc = PVector(0, 0)
         
     
+    # A good way for getting to a target from far away quickly. 
+    # This algorithm is based on Creg Renold's paper. 
+    # steering = desired - current, kind of like error correction
+    # What happens if the target is too close? The boid will overshoot,
+    # and it will continue going on forever.
+    def seek(self, target):
+        distance = PVector.sub(target, self.pos)
+        
+        # our desired velocity is that set to our max speed
+        desired = distance.setMag(self.max_speed)
+        # steering = desired - current
+        steering_force = PVector.sub(desired, self.vel)
+        # we need to make sure we don't apply too much force
+        steering_force.limit(self.max_force)
+        return steering_force
+        
+    
     # Steer in the average direction of nearby boids    
     def alignment(self, boids):
         # a Boid can't see everything!

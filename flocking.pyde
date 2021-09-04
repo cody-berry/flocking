@@ -12,13 +12,15 @@
 # v0.02 - Alignment
 # v0.03 - Cohesion
 # v0.0  - Separation
-# v0.0  - Obstacle Avoidance
+# v0.0  - Seek
 # v0.0  - Hack bot
 # v0.1  - 3D
 # v0.1  - Adjustible obstacles
 # v0.1  - Target
 # v0.1  - Auto-obstacle
 # v0.1  - Auto-target
+# v0.   - Obstacle Avoidance <- where does this go? I need to see when I create
+#                               my Obsticle Path repository.
 
 from Boid import *
 
@@ -39,8 +41,14 @@ def draw():
     # If we do just alignment, if the force is too strong, since the boids
     # depend on all of the other boids, some of the depended ones updated and 
     # others not updated, resulting in the boids just going in circles.
+    
+    mouse = PVector(mouseX, mouseY)
+    fill(90, 100, 100, 50)
+    circle(mouse.x, mouse.y, 16)
+    
     for boid in boids:
-        boid.flock(boids)
+        # boid.flock(boids)
+        boid.acc.add(boid.seek(mouse))
         boid.update()
         boid.edges()
         # boid.acc.add(PVector.random2D().mult(random(0.1, 0.3)))
