@@ -11,8 +11,8 @@
 # v0.01 - Create the Boid class
 # v0.02 - Alignment
 # v0.03 - Cohesion
-# v0.0  - Separation
-# v0.0  - Seek
+# v0.04 - Separation
+# v0.05 - Seek
 # v0.0  - Hack bot
 # v0.1  - 3D
 # v0.1  - Adjustible obstacles
@@ -44,11 +44,10 @@ def draw():
     
     mouse = PVector(mouseX, mouseY)
     fill(90, 100, 100, 50)
-    circle(mouse.x, mouse.y, 16)
     
     for boid in boids:
-        # boid.flock(boids)
-        boid.acc.add(boid.seek(mouse))
+        boid.flock(boids)
+        # boid.acc.add(boid(mouse))
         boid.update()
         boid.edges()
         # boid.acc.add(PVector.random2D().mult(random(0.1, 0.3)))

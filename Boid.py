@@ -31,7 +31,7 @@ class Boid:
     # This algorithm is based on Creg Renold's paper. 
     # steering = desired - current, kind of like error correction
     # What happens if the target is too close? The boid will overshoot,
-    # and it will continue going on forever.
+    # and it will continue going on forever, like a simple harmonic oscillator.
     def seek(self, target):
         distance = PVector.sub(target, self.pos)
         
@@ -42,7 +42,53 @@ class Boid:
         # we need to make sure we don't apply too much force
         steering_force.limit(self.max_force)
         return steering_force
+    
+    
+    # A good way to approach a velocity.
+    # This algorithm is based on Creg Renold's paper.
+    # steering force = desired - current
+    def seek_velocity(self, desired_velocity):
+        desired_velocity.setMag(self.max_speed)
+        # desired_velocity is our desired velocity!
+        steering_force = PVector.sub(desired_velocity, self.vel)
+        # we need to make sure we don't apply too much force
+        steering_force.limit(self.max_force)
+        return steering_force        
+    
+    
+    # Steering to avoid crowding other boids
+    def separation(self, boids):
+        perception_radius = 30
+        total = 0
+        average = PVector(0, 0) # this is our desired velocity
         
+        # find the average of the positions of all the boids
+        for boid in boids:
+            distance = PVector.dist(self.pos, boid.pos)
+            
+            # only calculate within a desired perception radius
+            if boid != self and distance < perception_radius:
+                difference = PVector.sub(self.pos, boid.pos)
+                # we want this difference to be inversely proportional to the distance between
+                # self and other; the further away it is, the lower the magnitude we want
+                
+                # TODO: fix zero division error
+                difference.div(distance)
+                
+                total += 1 # count how many are within our radius to divide later for average
+                
+                # in self.align, we added the other boids' velocities. here we add position!
+                average.add(difference)                
+        
+        steering_force = average
+        
+        if total > 0:
+            steering_force.div(total) # this is our desired velocity!
+            return self.seek_velocity(steering_force)
+        
+        else:
+            return average
+    
     
     # Steer in the average direction of nearby boids    
     def alignment(self, boids):
@@ -76,9 +122,7 @@ class Boid:
             # difference - current velocity
             steering_force = average
             steering_force.setMag(self.max_speed)
-            steering_force.sub(self.vel)
-            steering_force.limit(self.max_force)
-            return steering_force
+            return self.seek_velocity(steering_force)
         except:
             return average
             
@@ -112,63 +156,9 @@ class Boid:
             stroke(210, 90, 100)
             noFill()
             circle(self.pos.x, self.pos.y, perception_radius*2)
-            
-            # Now we can subtract our velocity, because our desired velocity = 
-            # difference - current velocity
-            steering_force = average
-            
-            steering_force.sub(self.pos) # TODO: Figure our why you subtract position
-            steering_force.setMag(self.max_speed)
-            steering_force = PVector.sub(average, self.vel)
-            steering_force.limit(self.max_force)
-            pushMatrix()
-            translate(self.pos.x, self.pos.y)
-            line(0, 0, steering_force.x, steering_force.y)
-            popMatrix()
-            return steering_force
+            return self.seek(average)
         except ZeroDivisionError:
             return average
-            
-        
-    
-    
-    # Steering to avoid crowding other boids
-    def seperation(self, boids):
-        perception_radius = 30
-        total = 0
-        average = PVector(0, 0) # this is our desired velocity
-        
-        # find the average of the positions of all the boids
-        for boid in boids:
-            distance = PVector.dist(self.pos, boid.pos)
-            
-            # only calculate within a desired perception radius
-            if boid != self and distance < perception_radius:
-                difference = PVector.sub(self.pos, boid.pos)
-                # we want this difference to be inversely proportional to the distance between
-                # self and other; the further away it is, the lower the magnitude we want
-                
-                # TODO: fix zero division error
-                difference.div(distance)
-                
-                total += 1 # count how many are within our radius to divide later for average
-                
-                # in self.align, we added the other boids' velocities. here we add position!
-                average.add(difference)                
-        
-        steering_force = average
-        
-        if total > 0:
-            steering_force.div(total) # this is our desired velocity!
-             
-            steering_force.setMag(self.max_speed)
-            steering_force.sub(self.vel)
-            steering_force.limit(self.max_force).mult(1.5)
-            
-            
-        # # note that if we didn't find anything, we return the zero vector
-        # return PVector(0, 0)
-        return steering_force
     
     
     # what if the boids go off the screen? We'll lose a pack though. The pack will
@@ -192,7 +182,7 @@ class Boid:
         # cohesion
         cohesion = self.cohesion(boids).mult(1)
         self.acc.add(cohesion)
-        # seperation
-        seperation = self.seperation(boids).mult(3)
-        self.acc.add(seperation)
+        # separation
+        separation = self.separation(boids).mult(3)
+        self.acc.add(separation)
         
