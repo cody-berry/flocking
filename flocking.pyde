@@ -13,6 +13,7 @@
 # v0.03 - Cohesion
 # v0.04 - Separation
 # v0.05 - Seek
+# v0.06 - Seek velocity
 # v0.0  - Hack bot
 # v0.1  - 3D
 # v0.1  - Adjustible obstacles
@@ -23,38 +24,51 @@
 #                               my Obsticle Path repository.
 
 from Boid import *
-
+from Quadtree import *
+from Rectangle import *
+from Point import *
 
 def setup():
-    global boids
+    global boids, qt, points
     colorMode(HSB, 360, 100, 100, 100)
     size(600, 600)
     boids = []
+    points = []
+    boundary = Rectangle(0, 0, width, height)
+    qt = Quadtree(boundary, 4)
+    for i in range(1000):
+        p = Point(random(width), random(height), None)
+        qt.insert(p)
+        points.append(p)
+        print(qt.count())
+        
     for i in range(100):
         boids.append(Boid(random(width), random(height)))
   
       
 def draw():
-    global boids
+    global boids, qt, points
     background(210, 80, 32)
     fill(0, 0, 100)
     # If we do just alignment, if the force is too strong, since the boids
     # depend on all of the other boids, some of the depended ones updated and 
     # others not updated, resulting in the boids just going in circles.
-    
+    qt.show()
+    for p in points:
+        circle(p.x, p.y, 2)
     mouse = PVector(mouseX, mouseY)
     fill(90, 100, 100, 50)
     
-    for boid in boids:
-        boid.flock(boids)
-        # boid.acc.add(boid(mouse))
-        boid.update()
-        boid.edges()
-        # boid.acc.add(PVector.random2D().mult(random(0.1, 0.3)))
+    # for boid in boids:
+    #     boid.flock(boids)
+    #     # boid.acc.add(boid(mouse))
+    #     boid.update()
+    #     boid.edges()
+    #     # boid.acc.add(PVector.random2D().mult(random(0.1, 0.3)))
         
-    for boid in boids:
-        fill(0, 0, 100)
-        boid.show()
+    # for boid in boids:
+    #     fill(0, 0, 100)
+    #     boid.show()
     
     s = "FPS: {:.0f}".format(frameRate)
     fill(0, 0, 100, 30)
@@ -63,5 +77,19 @@ def draw():
     textSize(24)
     fill(0, 0, 100)
     text(s, 50, 50)
+    
+    
+def mouseWheel(self):
+    global points, qt
+    p = Point(mouseX, mouseY, None)
+    points.append(p)
+    qt.insert(p)
+    
+    
+    
+    
+    
+    
+    
         
     

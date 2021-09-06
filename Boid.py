@@ -1,4 +1,5 @@
 
+from Quadtree import *
 
 class Boid:
     def __init__(self, x, y):
