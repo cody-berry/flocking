@@ -66,15 +66,17 @@ class Boid:
         # find the average of the positions of all the boids
         for boid in boids:
             distance = PVector.dist(self.pos, boid.pos)
-            
             # only calculate within a desired perception radius
             if boid != self and distance < perception_radius:
                 difference = PVector.sub(self.pos, boid.pos)
                 # we want this difference to be inversely proportional to the distance between
                 # self and other; the further away it is, the lower the magnitude we want
-                
+                midigation_division_error = 0.0001
                 # TODO: fix zero division error
-                difference.div(distance)
+                if distance != 0:
+                    difference.div(distance)
+                else:
+                    difference.div(midigation_division_error)
                 
                 total += 1 # count how many are within our radius to divide later for average
                 
